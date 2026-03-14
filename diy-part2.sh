@@ -10,6 +10,10 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 #
 
+# Replace Smartdns
+#./scripts/feeds uninstall luci-app-smartdns smartdns
+#./scripts/feeds install -a -p customsd
+
 # Replace luci-theme-argon
 rm -rfv feeds/luci/themes/luci-theme-argon
 git clone -b test1 https://github.com/Ljzkirito/luci-theme-argon.git feeds/luci/themes/luci-theme-argon
