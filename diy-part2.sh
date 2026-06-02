@@ -11,8 +11,8 @@
 #
 
 # Replace Smartdns
-#./scripts/feeds uninstall luci-app-smartdns smartdns
-#./scripts/feeds install -a -p customsd
+./scripts/feeds uninstall luci-app-smartdns smartdns
+./scripts/feeds install -a -p customsd
 
 # Replace luci-theme-argon
 rm -rfv feeds/luci/themes/luci-theme-argon
