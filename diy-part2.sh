@@ -23,3 +23,6 @@ rm -rfv feeds/luci/themes/luci-theme-argon
 git clone -b test1 https://github.com/Ljzkirito/luci-theme-argon.git feeds/luci/themes/luci-theme-argon
 
 sed -i 's/192.168.1.1/192.168.5.1/g' package/base-files/files/bin/config_generate
+
+#https://github.com/immortalwrt/packages/issues/1607
+#sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' feeds/packages/lang/rust/Makefile
