@@ -11,11 +11,8 @@
 #
 
 # Replace Smartdns
-rm -rfv feeds/luci/applications/luci-app-smartdns
-git clone --depth=1 -b PikuZheng https://github.com/Ljzkirito/smartdns-openwrt temp-smartdns
-mv -fv temp-smartdns/luci-app-smartdns feeds/luci/applications/
-mv -fv temp-smartdns/smartdns-ui package/emortal/
-rm -rf temp-smartdns
+./scripts/feeds uninstall luci-app-smartdns smartdns
+./scripts/feeds install -a -p customsd
 
 # Replace luci-theme-argon
 rm -rfv feeds/luci/themes/luci-theme-argon
