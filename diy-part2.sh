@@ -15,6 +15,11 @@ rm -rfv feeds/packages/lang/golang
 git clone --depth=1 https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
 
 # remove v2ray-geodata package from feeds (openwrt-22.03 & master)
+rm -rfv feeds/packages/net/v2ray-geodata
+rm -rfv feeds/packages/net/mosdns
+find ./ | grep Makefile | grep luci-app-mosdns | xargs rm -fv
+git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
+git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 
 # Replace Smartdns
 #./scripts/feeds uninstall luci-app-smartdns smartdns
@@ -47,15 +52,15 @@ git clone --depth 1 https://github.com/muink/luci-app-natmapt.git package/luci-a
 rm -rfv feeds/helloworld/dns2socks-rust
 rm -rfv feeds/helloworld/v2raya
 
-sed -i 's/192.168.1.1/192.168.6.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.5.1/g' package/base-files/files/bin/config_generate
 
 #git clone --depth=1 -b master https://github.com/fw876/helloworld
 #Replace_package="xray-core xray-plugin v2ray-core v2ray-plugin hysteria ipt2socks microsocks redsocks2 chinadns-ng dns2socks dns2tcp naiveproxy simple-obfs tcping tuic-client"
 #for a in ${Replace_package}
 #do
-#	echo "Replace_package=$a"
-# 	rm -rfv feeds/packages/net/"$a"
-#	cp -rv helloworld/"$a" feeds/packages/net
+#        echo "Replace_package=$a"
+#         rm -rfv feeds/packages/net/"$a"
+#        cp -rv helloworld/"$a" feeds/packages/net
 #done
 # sed -i 's/ +libopenssl-legacy//g' feeds/packages/net/shadowsocksr-libev/Makefile
 #rm -rfv feeds/luci/applications/luci-app-ssr-plus
@@ -66,5 +71,5 @@ sed -i 's/192.168.1.1/192.168.6.1/g' package/base-files/files/bin/config_generat
 #makefile_file="$({ find package|grep Makefile |sed "/Makefile./d"; } 2>"/dev/null")"
 #for a in ${makefile_file}
 #do
-#	[ -n "$(grep "upx" "$a")" ] && sed -i "/upx/d" "$a"
+#        [ -n "$(grep "upx" "$a")" ] && sed -i "/upx/d" "$a"
 #done
