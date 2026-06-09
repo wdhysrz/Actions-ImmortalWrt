@@ -35,7 +35,6 @@ env:
   UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
   DEVICE_NAME: mt7981
-  FILE_DATE: ${{ github.run_number }}-${{ github.sha }}
   FIRMWARE: ImmortalWrt-firmware
 
 jobs:
@@ -100,7 +99,7 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
 
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
 
       - name: Clone source code
         working-directory: /workdir
@@ -111,7 +110,7 @@ jobs:
 
       - name: Cache Toolchain
         uses: HiGarfield/cachewrtbuild@main
-        if: github.event.inputs.Cache == 'true'
+        if: ${{ github.event.inputs.Cache == 'true' }}
         with:
           ccache: true
           clean: false
@@ -160,18 +159,19 @@ jobs:
           echo "FILE_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
       - name: Check space usage
-        if: !cancelled()
+        if: ${{ !cancelled() }}
         run: df -hT
 
       - name: Upload bin directory
-        uses: actions/upload-artifact@main
-        if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+        uses: actions/upload-artifact@v4
+        if: ${{ steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true' && !cancelled() }}
         with:
           name: ImmortalWrt-bins-${{ env.DEVICE_NAME }}-${{ env.FILE_DATE }}
           path: ImmortalWrt/bin
 
       - name: Organize files
-        if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        id: organize
+        if: ${{ env.UPLOAD_FIRMWARE == 'true' && steps.compile.outputs.status == 'success' && !cancelled() }}
         run: |
           cd ImmortalWrt/bin/targets/*/*
           rm -rf packages
@@ -179,33 +179,28 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware directory
-        uses: actions/upload-artifact@main
-        if: steps.Organize.outputs.status == 'success' && !cancelled()
+        uses: actions/upload-artifact@v4
+        if: ${{ steps.organize.outputs.status == 'success' && !cancelled() }}
         with:
           name: ${{ env.FIRMWARE }}-${{ env.DEVICE_NAME }}-${{ env.FILE_DATE }}
           path: ${{ env.FIRMWARE }}
 
       - name: Generate release tag
         id: tag
-        if: env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled()
+        if: ${{ env.UPLOAD_RELEASE == 'true' && steps.compile.outputs.status == 'success' && !cancelled() }}
         run: |
           echo "release_tag=$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
           touch release.txt
           echo "### HanWckf's ImmortalWrt mt7981 Release $(date +"%Y.%m.%d-%H:%M")" >> release.txt
           echo "factory bin" >> release.txt
           echo "360T7-md5: $(md5sum ${{ env.FIRMWARE }}/*360-t7*factory.bin | cut -d" " -f1)" >> release.txt
-          echo "W30U112e-md5: $(md5sum ${{ env.FIRMWARE }}/*112m*factory.bin | cut -d" " -f1)" >> release.txt
           echo "sysupgrade bin" >> release.txt
           echo "360T7-sha256: $(grep "360-t7" ${{ env.FIRMWARE }}/sha256sums | cut -d" " -f1)" >> release.txt
-          echo "W30U112e-sha256: $(grep "112m" ${{ env.FIRMWARE }}/sha256sums | cut -d" " -f1)" >> release.txt
-          echo "stock sysupgrade bin" >> release.txt
-          echo "W30U-stock-md5: $(md5sum ${{ env.FIRMWARE }}/*stock*sysupgrade.bin | cut -d" " -f1)" >> release.txt
-          echo "W30U-stock-sha256: $(grep "stock" ${{ env.FIRMWARE }}/sha256sums | cut -d" " -f1)" >> release.txt
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v2
-        if: steps.tag.outputs.status == 'success' && !cancelled()
+        if: ${{ steps.tag.outputs.status == 'success' && !cancelled() }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ steps.tag.outputs.release_tag }}
@@ -213,12 +208,10 @@ jobs:
           files: |
             ${{ env.FIRMWARE }}/*360-t7*factory.bin
             ${{ env.FIRMWARE }}/*360-t7*sysupgrade.bin
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Prune Old Releases and Workflows
         uses: ghactions-deliveries/delete-releases@main
-        if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+        if: ${{ env.UPLOAD_RELEASE == 'true' && !cancelled() }}
         with:
           delete_releases: true
           delete_tags: true
