@@ -10,10 +10,7 @@
 # Description: OpenWrt DIY script part 1 (Before Update feeds)
 #
 
-git config --global url."https://mirror.ghproxy.com/https://github.com/".insteadOf "https://github.com/"
-echo "src-git passwall https://github.com/xiaorouji/openwrt-passwall-packages.git" >> feeds.conf.default
-echo "src-git passwall2 https://github.com/xiaorouji/openwrt-passwall2.git" >> feeds.conf.default
-
+echo "src-git helloworld https://github.com/fw876/helloworld.git;master" >> "feeds.conf.default"
 #echo "src-git customsd https://github.com/Ljzkirito/smartdns-openwrt.git;Release46-conf" >> "feeds.conf.default"
 
 # Replace /lib/netifd/ppp-down
