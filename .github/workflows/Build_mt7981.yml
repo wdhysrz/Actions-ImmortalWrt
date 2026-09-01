@@ -100,14 +100,7 @@ jobs:
           git clone -b $REPO_BRANCH --depth=1 $REPO_URL ImmortalWrt
           ln -sf /workdir/ImmortalWrt $GITHUB_WORKSPACE/ImmortalWrt
 
-      - name: Cache Toolchain
-        uses: HiGarfield/cache-ubuildenv@main
-        if: github.event.inputs.Cache == 'true'
-        with:
-          cache: 'false'
-          clean: 'false'
-          mixkey: 'aarch64'
-          prefix: ${{ github.workspace }}/ImmortalWrt
+      # 注意：移除了 Cache Toolchain 步骤（原 HiGarfield/cache-ubuildenv 已失效）
 
       - name: Load custom feeds (DIY_P1_SH)
         run: |
