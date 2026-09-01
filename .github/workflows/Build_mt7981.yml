@@ -24,7 +24,7 @@ on:
           - 'false'
 
 env:
-  REPO_URL: https://github.com/chasey-dev/immortalwrt-mt798x-rebase
+  REPO_URL: https://github.com/shiyu1314/immortalwrt-mt798x-6.12
   REPO_BRANCH: 25.12
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: mt7981.config
