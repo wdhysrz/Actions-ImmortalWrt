@@ -18,6 +18,26 @@ mv -fv temp-smartdns/luci-app-smartdns feeds/luci/applications/
 mv -fv temp-smartdns/smartdns feeds/packages/net/
 rm -rf temp-smartdns
 
+# 拉取 passwall-packages
+git clone https://github.com/kenzok8/passwall-packages feeds/passwall-packages
+
+# 删除全部不需要的代理内核源码，只留 sing-box
+rm -rf feeds/passwall-packages/xray-core
+rm -rf feeds/passwall-packages/v2ray-core
+rm -rf feeds/passwall-packages/hysteria
+rm -rf feeds/passwall-packages/naiveproxy
+rm -rf feeds/passwall-packages/trojan-go
+rm -rf feeds/passwall-packages/shadowsocks-rust
+
+# 可选：清理插件（非必需，精简固件体积）
+rm -rf feeds/passwall-packages/xray-plugin
+rm -rf feeds/passwall-packages/v2ray-plugin
+
+# 更新 & 安装 feeds
+./scripts/feeds update -a
+./scripts/feeds install -a
+
+
 # Replace luci-theme-argon
 rm -rfv feeds/luci/themes/luci-theme-argon
 git clone https://github.com/jerrykuku/luci-theme-argon.git feeds/luci/themes/luci-theme-argon
