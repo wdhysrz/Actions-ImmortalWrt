@@ -10,6 +10,8 @@
 # Description: OpenWrt DIY script part 1 (Before Update feeds)
 #
 
+sed -i 's/192.168.1.1/192.168.6.1/g' package/base-files/files/bin/config_generate
+
 # 取消Dnsmasq缓存，由smartdns负责。不修改ttl
 #sed -i 's/cachesize\t8000/cachesize\t0/g' package/network/services/dnsmasq/files/dhcp.conf
 #sed -i 's/mini_ttl\t3600/mini_ttl\t0/g' package/network/services/dnsmasq/files/dhcp.conf
