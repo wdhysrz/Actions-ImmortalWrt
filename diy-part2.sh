@@ -1,17 +1,27 @@
 #!/bin/bash
 
 # ==========================================
-# 1. 修复 mtwi-fi-cfg 和 l1util 的文件冲突 (必须保留 WiFi)
 # ==========================================
-echo "正在修复 mtwi-fi-cfg 与 l1util 的文件冲突..."
-MTWIFI_MAKEFILE=$(find package/ -name Makefile -path "*mtwifi-cfg*" | head -n 1)
+# 1. 修复 mtwifi-cfg 和 lutil 的文件冲突 (必须保留 WiFi)
+# ==========================================
+echo "正在修复 mtwifi-cfg 与 lutil 的文件冲突..."
+# 修复：MTK的包通常在 feeds/ 目录下，不仅仅是在 package/ 目录下
+MTWIFI_MAKEFILE=$(find . -name Makefile -path "*mtwifi-cfg*" | head -n 1)
+
 if [ -n "$MTWIFI_MAKEFILE" ]; then
     MTWIFI_DIR=$(dirname "$MTWIFI_MAKEFILE")
-    # 删除自带的老旧 l1util 文件夹，防止覆盖系统的包
-    rm -rf "$MTWIFI_DIR/files/l1util"
-    # 从 Makefile 中删除所有包含 l1util 的安装和链接行，让它直接使用系统的 l1util
-    sed -i '/l1util/d' "$MTWIFI_MAKEFILE"
-    echo "mtwi-fi-cfg 冲突修复完成！"
+    echo "找到 Makefile 路径: $MTWIFI_MAKEFILE"
+    
+    # 修复：正确的文件名是 lutil 而不是 l1util
+    # 彻底删除 mtwifi-cfg 自带的 lutil 文件夹，防止覆盖系统包
+    rm -rf "$MTWIFI_DIR/files/sbin/lutil"
+    rm -rf "$MTWIFI_DIR/files/lutil"
+    
+    # 修复：删除 Makefile 中所有涉及 lutil 的安装和链接行
+    sed -i '/lutil/d' "$MTWIFI_MAKEFILE"
+    echo "mtwifi-cfg 冲突修复完成！"
+else
+    echo "警告：未能找到 mtwifi-cfg 的 Makefile 文件，请检查源码目录！"
 fi
 
 # ==========================================
