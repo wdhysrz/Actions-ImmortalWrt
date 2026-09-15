@@ -1,55 +1,22 @@
 #!/bin/bash
-#
-# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
-#
-# This is free software, licensed under the MIT License.
-# See /LICENSE for more information.
-#
-# https://github.com/P3TERX/Actions-OpenWrt
-# File name: diy-part2.sh
-# Description: OpenWrt DIY script part 2 (After Update feeds)
-#
 
-# 找到 mtwifi-cfg 的 Makefile
-MTWIFI_MAKEFILE=$(find package/ feeds/ -name Makefile -path "*mtwifi-cfg*" | head -n 1)
-if [ -n "$MTWIFI_MAKEFILE" ]; then
-    echo "Patching mtwifi-cfg Makefile: $MTWIFI_MAKEFILE"
-    # 删除对 l1util 的依赖
-    sed -i 's/+l1util//g' $MTWIFI_MAKEFILE
-fi
-
-# Replace Smartdns
-rm -rfv feeds/luci/applications/luci-app-smartdns
-rm -rfv feeds/packages/net/smartdns
-git clone --depth=1 -b PikuZheng https://github.com/Ljzkirito/smartdns-openwrt temp-smartdns
-mv -fv temp-smartdns/luci-app-smartdns feeds/luci/applications/
-mv -fv temp-smartdns/smartdns feeds/packages/net/
-rm -rf temp-smartdns
-
-# 拉取 passwall-packages
-git clone https://github.com/kenzok8/passwall-packages feeds/passwall-packages
-
-# 删除全部不需要的代理内核源码，只留 sing-box
-rm -rf feeds/passwall-packages/xray-core
-rm -rf feeds/passwall-packages/v2ray-core
-rm -rf feeds/passwall-packages/hysteria
-rm -rf feeds/passwall-packages/naiveproxy
-rm -rf feeds/passwall-packages/trojan-go
-rm -rf feeds/passwall-packages/shadowsocks-rust
-
-# 可选：清理插件（非必需，精简固件体积）
-rm -rf feeds/passwall-packages/xray-plugin
-rm -rf feeds/passwall-packages/v2ray-plugin
-
-# 更新 & 安装 feeds
+# 1. 更新并安装 feeds（保证基础依赖正常）
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
+# 2. 移除可能冲突的旧核心和 LuCI 包
+rm -rf feeds/luci/applications/luci-app-passwall
+rm -rf feeds/packages/net/{xray-core,v2ray-geodata,sing-box,chinadns-ng,dns2socks,hysteria,ipt2socks,microsocks,naiveproxy,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-plugin,xray-plugin,geoview,shadow-tls}
 
-# Replace luci-theme-argon
-rm -rfv feeds/luci/themes/luci-theme-argon
-git clone https://github.com/jerrykuku/luci-theme-argon.git feeds/luci/themes/luci-theme-argon
-git -C feeds/luci/themes/luci-theme-argon checkout 1991a8e29ef6a086fb566517675edc85b1be629a
+# 3. 克隆 Passwall 源码和依赖包
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall-packages package/passwall-packages
+git clone https://github.com/Openwrt-Passwall/openwrt-passwall package/passwall-luci
 
-#https://github.com/immortalwrt/packages/issues/1607
-#sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' feeds/packages/lang/rust/Makefile
+# 4. 严格根据要求，只保留 sing-box，删除其他所有代理核心
+rm -rf package/passwall-packages/xray-core
+rm -rf package/passwall-packages/v2ray-core
+rm -rf package/passwall-packages/hysteria
+rm -rf package/passwall-packages/naiveproxy
+rm -rf package/passwall-packages/trojan-go
+rm -rf package/passwall-packages/shadowsocks-rust
+# 保留 package/passwall-packages/sing-box
