@@ -10,6 +10,14 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 #
 
+# 找到 mtwifi-cfg 的 Makefile
+MTWIFI_MAKEFILE=$(find package/ feeds/ -name Makefile -path "*mtwifi-cfg*" | head -n 1)
+if [ -n "$MTWIFI_MAKEFILE" ]; then
+    echo "Patching mtwifi-cfg Makefile: $MTWIFI_MAKEFILE"
+    # 删除对 l1util 的依赖
+    sed -i 's/+l1util//g' $MTWIFI_MAKEFILE
+fi
+
 # Replace Smartdns
 rm -rfv feeds/luci/applications/luci-app-smartdns
 rm -rfv feeds/packages/net/smartdns
